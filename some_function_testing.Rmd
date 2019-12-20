@@ -1,0 +1,550 @@
+---
+title: "Functional"
+author: "Justin Harder"
+date: "10/11/2019"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+''''
+setwd("C:/Users/Exiz/Documents/DataScience/Munging/Munging_project/MUNGE_MUNGE_MUNGE/")
+scorecard <- read.csv(file = "Data/data_scorecard.csv",na.strings = c(""))
+scorecard$X09.10.Net.price.public
+''''
+scorecard.df <- read.csv("C:/Users/Manda/Documents/Data-Munging/CollegeScorecard_Raw_Data/sep-sheets/filtered-all-years.csv", na.strings = c('') )
+scorecard.df
+
+```
+
+```{r}
+income_groups_08.09 <- c("X09.10.Net.price.public","X09.10.0.30k.net.price.public", "X09.10.30.48k.net.price.public" , "X09.10.48.75k.net.price.public" ,"X09.10.75.110k.net.price.public" , "X09.10.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for lowest income group
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumalitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumalitive <- cumalitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumalitive)
+}
+poop <- variance_of_colleges(scorecard, income_groups_08.09)
+sum(is.na(poop))
+```
+### Years 09-10
+
+```{r}
+
+income_groups_09.10 <- c("X09.10.Net.price.public","X09.10.0.30k.net.price.public", "X09.10.30.48k.net.price.public" , "X09.10.48.75k.net.price.public" ,"X09.10.75.110k.net.price.public" , "X09.10.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for income groups
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumulitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumulitive <- cumulitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumulitive)
+}
+X09.10.variance <- variance_of_colleges(scorecard, income_groups_09.10)
+
+```
+
+## Including Plots - 09-10
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+resizing <- function(global_max, global_min, college_variance){
+   #This function remaps the points between [min, max] to points between [0,1]
+   (global_min-college_variance)/(global_min-global_max)
+}
+
+sum(is.na(X09.10.variance))
+X09.10.variance.min <- summary(X09.10.variance)[[1]]
+X09.10.variance.max <- summary(X09.10.variance )[[6]]
+
+X09.10.accessibility.metric <- resizing(global_max = X09.10.variance.max , global_min = X09.10.variance.min, X09.10.variance)
+summary(X09.10.accessibility.metric) 
+
+
+```
+
+### Years 10-11
+
+```{r}
+
+income_groups_10.11 <- c("X10.11.Net.price.public","X10.11.0.30k.net.price.public", "X10.11.30.48k.net.price.public" , "X10.11.48.75k.net.price.public" ,"X10.11.75.110k.net.price.public" , "X10.11.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for income groups
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumulitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumulitive <- cumulitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumulitive)
+}
+X10.11.variance <- variance_of_colleges(scorecard, income_groups_10.11)
+
+```
+
+## Including Plots 10-11
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+resizing <- function(global_max, global_min, college_variance){
+   #This function remaps the points between [min, max] to points between [0,1]
+   (global_min-college_variance)/(global_min-global_max)
+}
+
+sum(is.na(X10.11.variance))
+X10.11.variance.min <- summary(X10.11.variance)[[1]]
+X10.11.variance.max <- summary(X10.11.variance )[[6]]
+
+X10.11.accessibility.metric <- resizing(global_max = X10.11.variance.max , global_min = X10.11.variance.min, X10.11.variance)
+summary(X10.11.accessibility.metric) 
+
+
+```
+
+### Years 11-12
+
+```{r}
+
+income_groups_11.12 <- c("X11.12.Net.price.public","X11.12.0.30k.net.price.public", "X11.12.30.48k.net.price.public" , "X11.12.48.75k.net.price.public" ,"X11.12.75.110k.net.price.public" , "X11.12.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for income groups
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumulitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumulitive <- cumulitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumulitive)
+}
+X11.12.variance <- variance_of_colleges(scorecard, income_groups_11.12)
+
+```
+
+## Including Plots 11-12
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+resizing <- function(global_max, global_min, college_variance){
+   #This function remaps the points between [min, max] to points between [0,1]
+   (global_min-college_variance)/(global_min-global_max)
+}
+
+sum(is.na(X11.12.variance))
+X11.12.variance.min <- summary(X11.12.variance)[[1]]
+X11.12.variance.max <- summary(X11.12.variance )[[6]]
+
+X11.12.accessibility.metric <- resizing(global_max = X11.12.variance.max , global_min = X11.12.variance.min, X11.12.variance)
+summary(X11.12.accessibility.metric) 
+
+
+```
+
+### Years 12-13
+
+```{r}
+
+income_groups_12.13 <- c("X12.13.Net.price.public","X12.13.0.30k.net.price.public", "X12.13.30.48k.net.price.public" , "X12.13.48.75k.net.price.public" ,"X12.13.75.110k.net.price.public" , "X12.13.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for income groups
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumulitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumulitive <- cumulitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumulitive)
+}
+X12.13.variance <- variance_of_colleges(scorecard, income_groups_12.13)
+
+```
+
+## Including Plots 12-13
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+resizing <- function(global_max, global_min, college_variance){
+   #This function remaps the points between [min, max] to points between [0,1]
+   (global_min-college_variance)/(global_min-global_max)
+}
+
+sum(is.na(X12.13.variance))
+X12.13.variance.min <- summary(X12.13.variance)[[1]]
+X12.13.variance.max <- summary(X12.13.variance )[[6]]
+
+X12.13.accessibility.metric <- resizing(global_max = X12.13.variance.max , global_min = X12.13.variance.min, X12.13.variance)
+summary(X12.13.accessibility.metric) 
+
+
+```
+
+### Years 13-14
+
+```{r}
+
+income_groups_13.14 <- c("X13.14.Net.price.public","X13.14.0.30k.net.price.public", "X13.14.30.48k.net.price.public" , "X13.14.48.75k.net.price.public" ,"X13.14.75.110k.net.price.public" , "X13.14.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for income groups
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumulitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumulitive <- cumulitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumulitive)
+}
+X13.14.variance <- variance_of_colleges(scorecard, income_groups_13.14)
+
+```
+
+## Including Plots 13-14
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+resizing <- function(global_max, global_min, college_variance){
+   #This function remaps the points between [min, max] to points between [0,1]
+   (global_min-college_variance)/(global_min-global_max)
+}
+
+sum(is.na(X13.14.variance))
+X13.14.variance.min <- summary(X13.14.variance)[[1]]
+X13.14.variance.max <- summary(X13.14.variance )[[6]]
+
+X13.14.accessibility.metric <- resizing(global_max = X13.14.variance.max , global_min = X13.14.variance.min, X13.14.variance)
+summary(X13.14.accessibility.metric) 
+
+
+```
+
+### Years 14-15
+
+```{r}
+
+income_groups_14.15 <- c("X14.15.Net.price.public","X14.15.0.30k.net.price.public", "X14.15.30.48k.net.price.public" , "X14.15.48.75k.net.price.public" ,"X14.15.75.110k.net.price.public" , "X14.15.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for income groups
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumulitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumulitive <- cumulitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumulitive)
+}
+X14.15.variance <- variance_of_colleges(scorecard, income_groups_14.15)
+
+```
+
+## Including Plots 14-15
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+resizing <- function(global_max, global_min, college_variance){
+   #This function remaps the points between [min, max] to points between [0,1]
+   (global_min-college_variance)/(global_min-global_max)
+}
+
+sum(is.na(X14.15.variance))
+X14.15.variance.min <- summary(X14.15.variance)[[1]]
+X14.15.variance.max <- summary(X14.15.variance )[[6]]
+
+X14.15.accessibility.metric <- resizing(global_max = X14.15.variance.max , global_min = X14.15.variance.min, X14.15.variance)
+summary(X14.15.accessibility.metric) 
+
+
+```
+
+### Years 15-16
+
+```{r}
+
+income_groups_15.16 <- c("X15.16.Net.price.public","X15.16.0.30k.net.price.public", "X15.16.30.48k.net.price.public" , "X15.16.48.75k.net.price.public" ,"X15.16.75.110k.net.price.public" , "X15.16.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for income groups
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumulitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumulitive <- cumulitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumulitive)
+}
+X15.16.variance <- variance_of_colleges(scorecard, income_groups_15.16)
+
+```
+
+## Including Plots 15-16
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+resizing <- function(global_max, global_min, college_variance){
+   #This function remaps the points between [min, max] to points between [0,1]
+   (global_min-college_variance)/(global_min-global_max)
+}
+
+sum(is.na(X15.16.variance))
+X15.16.variance.min <- summary(X15.16.variance)[[1]]
+X15.16.variance.max <- summary(X15.16.variance )[[6]]
+
+X15.16.accessibility.metric <- resizing(global_max = X15.16.variance.max , global_min = X15.16.variance.min, X15.16.variance)
+summary(X15.16.accessibility.metric) 
+
+
+```
+
+### Years 16-17
+
+```{r}
+
+income_groups_16.17 <- c("X16.17.Net.price.public","X16.17.0.30k.net.price.public", "X16.17.30.48k.net.price.public" , "X16.17.48.75k.net.price.public" ,"X16.17.75.110k.net.price.public" , "X16.17.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for income groups
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumulitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumulitive <- cumulitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumulitive)
+}
+X16.17.variance <- variance_of_colleges(scorecard, income_groups_16.17)
+
+```
+
+## Including Plots 16-17
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+resizing <- function(global_max, global_min, college_variance){
+   #This function remaps the points between [min, max] to points between [0,1]
+   (global_min-college_variance)/(global_min-global_max)
+}
+
+sum(is.na(X16.17.variance))
+X16.17.variance.min <- summary(X16.17.variance)[[1]]
+X16.17.variance.max <- summary(X16.17.variance )[[6]]
+
+X16.17.accessibility.metric <- resizing(global_max = X16.17.variance.max , global_min = X16.17.variance.min, X16.17.variance)
+summary(X16.17.accessibility.metric) 
+
+
+```
+
+
+### Years 17-18
+
+```{r}
+
+income_groups_17.18 <- c("X17.18.Net.price.public","X17.18.0.30k.net.price.public", "X17.18.30.48k.net.price.public" , "X17.18.48.75k.net.price.public" ,"X17.18.75.110k.net.price.public" , "X17.18.110k.net.price.public")
+
+
+variance_of_colleges <- function(dataframe, column_names_vector){
+  #We can change this to simply work on vectors, or whatever we need for functionality
+  # Only like this for "backbone".
+  atc  <- as.numeric(c(unlist(dataframe[column_names_vector[1]]))) #average tuition cost
+  ac <- c()                              # average cost of different income groups as a list
+  for (i in 2:6){
+  ac <- cbind(ac, as.numeric(c(unlist(dataframe[column_names_vector[i]])))) #average cost for income groups
+  }
+  burden <- c()                              # list for the burden of different groups.
+  for (i in 1:5){
+    burden <- cbind(burden, (as.numeric(ac[,i]) - as.numeric(atc))/as.numeric(atc))
+  }
+
+  # Here we calculate a variance for the colleges:
+  # I think I have another possible measure that accounts for inversions!
+  # This is temporary as proof of concept!
+  cumulitive <- rep(0, nrow(dataframe))
+  for (i in 1:5){
+    cumulitive <- cumulitive + abs(as.numeric(burden[,i]))
+  }
+  return(cumulitive)
+}
+X17.18.variance <- variance_of_colleges(scorecard, income_groups_17.18)
+
+```
+
+## Including Plots 17-18
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+resizing <- function(global_max, global_min, college_variance){
+   #This function remaps the points between [min, max] to points between [0,1]
+   (global_min-college_variance)/(global_min-global_max)
+}
+
+sum(is.na(X17.18.variance))
+X17.18.variance.min <- summary(X17.18.variance)[[1]]
+X17.18.variance.max <- summary(X17.18.variance )[[6]]
+
+X17.18.accessibility.metric <- resizing(global_max = X17.18.variance.max , global_min = X17.18.variance.min, X17.18.variance)
+summary(X17.18.accessibility.metric) 
+
+
+```
+
+
+```{r pressure, echo=FALSE}
+summary(X09.10.accessibility.metric) 
+summary(X10.11.accessibility.metric) 
+summary(X11.12.accessibility.metric) 
+summary(X12.13.accessibility.metric) 
+summary(X13.14.accessibility.metric) 
+summary(X14.15.accessibility.metric)
+summary(X15.16.accessibility.metric)
+summary(X16.17.accessibility.metric)
+summary(X17.18.accessibility.metric)
+
+
+
+```
